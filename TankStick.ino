@@ -14,6 +14,14 @@ int throttle = 0;
 int brake    = 0;
 int rotateMin = 300;
 int rotateMax = 874;
+int xaxis = 0;
+int xmin = 100;
+int xzero = 488;
+int xmax = 930;
+int yaxis = 0;
+int ymin = 100;
+int yzero = 456;
+int ymax = 850;
 
 void setup() {
   for(byte i=0; i<28; i++){
@@ -24,7 +32,12 @@ void setup() {
 void loop() {
   Serial.printf("%i, %i, %i, %i, %i, %i\n",analogRead(A0),analogRead(A1),analogRead(A2),analogRead(A3),analogRead(A4));
   // read analog inputs and set X-Y position
-  Joystick.X(analogRead(A0));
+  if(analogRead(A0) > xzero){
+    xaxis = (analogRead(A0)-xzero)*(512/(xmax-xzero))+512;
+  } else{
+    xaxis = (analogRead(A0)-xmin)*(512/(xzero-xmin));
+  }
+  Joystick.X(constrain(xaxis,0,1024));
   Joystick.Y(analogRead(A1));
   throttle=(analogRead(A2)-462)*12;
   brake = (556-analogRead(A4))*10;
