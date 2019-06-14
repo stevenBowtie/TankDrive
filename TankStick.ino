@@ -19,9 +19,9 @@ int xmin = 100;
 int xzero = 488;
 int xmax = 930;
 int yaxis = 0;
-int ymin = 100;
+int ymin = 132;
 int yzero = 456;
-int ymax = 850;
+int ymax = 800;
 
 void setup() {
   for(byte i=0; i<28; i++){
@@ -33,12 +33,18 @@ void loop() {
   Serial.printf("%i, %i, %i, %i, %i, %i\n",analogRead(A0),analogRead(A1),analogRead(A2),analogRead(A3),analogRead(A4));
   // read analog inputs and set X-Y position
   if(analogRead(A0) > xzero){
-    xaxis = (analogRead(A0)-xzero)*(512/(xmax-xzero))+512;
+    xaxis = (analogRead(A0)-xzero)*(512.0/(xmax-xzero))+512;
   } else{
-    xaxis = (analogRead(A0)-xmin)*(512/(xzero-xmin));
+    xaxis = 512-(xzero-analogRead(A0))*(512.0/(xzero-xmin));
   }
+  Serial.println(xaxis);
   Joystick.X(constrain(xaxis,0,1024));
-  Joystick.Y(analogRead(A1));
+  if(analogRead(A1) > yzero){
+    yaxis = (analogRead(A1)-yzero)*(512.0/(ymax-yzero))+512;
+  } else{
+    yaxis = 512-(yzero-analogRead(A1))*(512.0/(yzero-ymin));
+  }
+  Joystick.Y(yaxis);
   throttle=(analogRead(A2)-462)*12;
   brake = (556-analogRead(A4))*10;
   Joystick.Z(constrain(throttle+brake,0,1024));
@@ -57,7 +63,7 @@ void loop() {
   Joystick.button(9, !digitalRead(9));
   Joystick.button(6, !digitalRead(8));
   Joystick.button(14, !digitalRead(7));
-  Joystick.button(13, !digitalRead(6));
+  //Joystick.button(13, !digitalRead(6));
   Joystick.button(12, !digitalRead(5));
   Joystick.button(11, !digitalRead(4));
   Joystick.button(17, !digitalRead(3));
