@@ -10,6 +10,11 @@
    This example code is in the public domain.
 */
 
+int throttle = 0;
+int brake    = 0;
+int rotateMin = 300;
+int rotateMax = 874;
+
 void setup() {
   for(byte i=0; i<28; i++){
     pinMode(i, INPUT_PULLUP);
@@ -17,12 +22,14 @@ void setup() {
 }
 
 void loop() {
+  Serial.printf("%i, %i, %i, %i, %i, %i\n",analogRead(A0),analogRead(A1),analogRead(A2),analogRead(A3),analogRead(A4));
   // read analog inputs and set X-Y position
   Joystick.X(analogRead(A0));
   Joystick.Y(analogRead(A1));
-  Joystick.sliderRight(analogRead(A2));
-  Joystick.Zrotate(analogRead(A3));
-  Joystick.sliderLeft(analogRead(A4));
+  throttle=(analogRead(A2)-462)*12;
+  brake = (556-analogRead(A4))*10;
+  Joystick.Z(constrain(throttle+brake,0,1024));
+  Joystick.Zrotate(constrain((analogRead(A3)-rotateMin)*1.7839,0,1024));
   
 
   // read the digital inputs and set the buttons
